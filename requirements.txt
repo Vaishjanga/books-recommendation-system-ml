@@ -33,6 +33,7 @@ transformers==4.36.2
 huggingface-hub==0.19.4
 tokenizers==0.15.0
 safetensors==0.4.1
+faiss-cpu==1.7.4
 
 # Web & Security
 Werkzeug==3.0.1
