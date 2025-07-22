@@ -1,0 +1,9 @@
+type: web
+    name: myapp
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    python:
+      version: 3.12.6
