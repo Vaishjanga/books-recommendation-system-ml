@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Search Books - Recommendation System{% endblock %}
+
+{% block content %}
+<div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); box-shadow: 0 4px 24px rgba(80,80,180,0.08); border-radius: 18px; padding: 2.5rem 2rem; max-width: 700px; margin: 2rem auto;">
+    <h2 style="color: #4f46e5; font-size: 2.3rem; font-weight: 700; text-align: center; margin-bottom: 1.5rem; letter-spacing: 1px;">Find Your Next Great Read</h2>
+    <form method="get" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+      <input type="text" name="query" placeholder="Search for books..." value="{{ query }}" 
+             style="width: 420px; padding: 1.2rem 1.5rem; border: 2px solid #6366f1; border-radius: 8px; font-size: 1.35rem; background: #fff; box-shadow: 0 2px 8px rgba(99,102,241,0.07); outline: none; transition: border 0.2s;"
+             onfocus="this.style.borderColor='#a21caf'" onblur="this.style.borderColor='#6366f1'">
+      <button type="submit" style="padding: 1.1rem 2.2rem; font-size: 1.25rem; background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border: none; border-radius: 8px; font-weight: 600; box-shadow: 0 2px 8px rgba(99,102,241,0.13); cursor: pointer; transition: background 0.2s, transform 0.1s;">Search</button>
+    </form>
+    {% if query %}
+        {% if is_nl and parsed %}
+            <div style="background: #f4f8fb; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                <strong>AI understood:</strong>
+                <ul style="margin: 0;">
+                    {% for k, v in parsed.items() %}
+                        <li><b>{{ k }}:</b> {{ v or 'None' }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        {% if results %}
+            <h3 style="color: #a21caf; font-size: 1.5rem; margin-bottom: 1.2rem;">Results for "{{ query }}":</h3>
+            <ul style="list-style: none; padding: 0;">
+                {% for book in results %}
+                    <li style="margin-bottom: 1.3rem; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px rgba(99,102,241,0.07); padding: 1.1rem 1.5rem; transition: box-shadow 0.2s;">
+                        <a href="{{ url_for('get_book_details', book_id=book['id']) }}" style="color: #4f46e5; font-size: 1.18rem; font-weight: 600; text-decoration: none; transition: color 0.2s;" onmouseover="this.style.color='#a21caf'" onmouseout="this.style.color='#4f46e5'">
+                            {{ book['title'] }} by {{ book['author'] }}
+                        </a>
+                        {% if book['explanation'] %}<br><small style="color: #64748b;">{{ book['explanation'] }}</small>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div style="color: #888;">No results found.</div>
+        {% endif %}
+    {% else %}
+        <div style="text-align: center; color: #7f8c8d; padding: 2rem;">
+            <h3>Try searching for:</h3>
+            <p>"Harry Potter" for fantasy books</p>
+            <p>"Agatha Christie" for mystery novels</p>
+            <p>"Stephen King" for horror stories</p>
+            <p>"Recommend me a dark mystery like Sherlock Holmes"</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

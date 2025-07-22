@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Recommendation System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Your Profile</h2>
+    
+    <div id="profile-data">
+        <div class="loading"></div> Loading profile...
+    </div>
+</div>
+
+<div class="card">
+    <h3>Reading Statistics</h3>
+    <div id="reading-stats" class="stats-grid">
+        <!-- Stats will be loaded here -->
+    </div>
+</div>
+
+<div class="card">
+    <h3>Recent Activity</h3>
+    <div id="recent-ratings">
+        <div class="loading"></div> Loading recent activity...
+    </div>
+</div>
+
+<script>
+function loadProfile() {
+    fetch('/api/users/profile', {
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Display profile info
+        document.getElementById('profile-data').innerHTML = `
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+                <div>
+                    <h4>Personal Information</h4>
+                    <p><strong>Username:</strong> ${data.username}</p>
+                    <p><strong>Email:</strong> ${data.email}</p>
+                    <p><strong>Age:</strong> ${data.age || 'Not specified'}</p>
+                    <p><strong>Location:</strong> ${data.location || 'Not specified'}</p>
+                    <p><strong>Member since:</strong> ${new Date(data.created_at).toLocaleDateString()}</p>
+                </div>
+                <div>
+                    <h4>Preferences</h4>
+                    <p><strong>Favorite Genres:</strong> ${data.preferences?.favorite_genres?.join(', ') || 'None selected'}</p>
+                    <button class="btn" onclick="editPreferences()">Edit Preferences</button>
+                </div>
+            </div>
+        `;
+        
+        // Display reading statistics
+        document.getElementById('reading-stats').innerHTML = `
+            <div class="stat-card">
+                <div class="stat-number">${data.statistics.total_ratings}</div>
+                <div class="stat-label">Books Rated</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${data.statistics.avg_rating_given || 'N/A'}</div>
+                <div class="stat-label">Avg Rating Given</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">${data.statistics.favorite_authors.length}</div>
+                <div class="stat-label">Authors Read</div>
+            </div>
+        `;
+        
+        // Display recent activity
+        const recentActivity = data.recent_activity.map(activity => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid #eee;">
+                <div>
+                    <strong>${activity.book_title}</strong><br>
+                    <small>by ${activity.book_author}</small>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 1.2rem; color: #3498db;">${activity.rating}/10</div>
+                    <small>${new Date(activity.created_at).toLocaleDateString()}</small>
+                </div>
+            </div>
+        `).join('');
+        
+        document.getElementById('recent-ratings').innerHTML = recentActivity || 
+            '<p style="text-align: center; color: #7f8c8d;">No recent activity</p>';
+    })
+    .catch(error => {
+        document.getElementById('profile-data').innerHTML = 
+            '<div class="alert alert-error">Error loading profile</div>';
+    });
+}
+
+function editPreferences() {
+    const newGenres = prompt('Enter your favorite genres (comma-separated):');
+    if (newGenres === null) return;
+    
+    const genres = newGenres.split(',').map(g => g.trim()).filter(g => g.length > 0);
+    
+    fetch('/api/users/profile', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        },
+        body: JSON.stringify({
+            preferences: {
+                favorite_genres: genres
+            }
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Preferences updated successfully!');
+        loadProfile(); // Reload profile
+    })
+    .catch(error => {
+        alert('Error updating preferences. Please try again.');
+    });
+}
+
+// Load profile on page load
+loadProfile();
+</script>
+{% endblock %}

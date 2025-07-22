@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Book Details - {{ book.title }}{% endblock %}
+
+{% block content %}
+<div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); box-shadow: 0 4px 24px rgba(80,80,180,0.10); border-radius: 18px; padding: 2.5rem 2rem; max-width: 600px; margin: 2rem auto; border: 1.5px solid #e0e7ff;">
+    <h2 style="color: #4f46e5; font-size: 2.1rem; font-weight: 700; margin-bottom: 0.7rem;">{{ book.title }}</h2>
+    <p style="font-size: 1.1rem;"><strong>Author:</strong> <span style="color: #a21caf;">{{ book.author }}</span></p>
+    {% if book.genre %}<p style="font-size: 1.1rem;"><strong>Genre:</strong> <span style="color: #6366f1;">{{ book.genre }}</span></p>{% endif %}
+    {% if book.mood %}<p style="font-size: 1.1rem;"><strong>Mood:</strong> <span style="color: #f59e42;">{{ book.mood }}</span></p>{% endif %}
+    {% if book.publisher %}<p style="font-size: 1.1rem;"><strong>Publisher:</strong> <span style="color: #64748b;">{{ book.publisher }}</span></p>{% endif %}
+    {% if book.year %}<p style="font-size: 1.1rem;"><strong>Year:</strong> <span style="color: #64748b;">{{ book.year }}</span></p>{% endif %}
+    {% if book.popularity_score is not none %}<p style="font-size: 1.1rem;"><strong>Popularity Score:</strong> <span style="color: #10b981;">{{ book.popularity_score }}</span></p>{% endif %}
+    {% if book.quality_score is not none %}<p style="font-size: 1.1rem;"><strong>Quality Score:</strong> <span style="color: #f59e42;">{{ book.quality_score }}</span></p>{% endif %}
+    <hr style="border-top: 1.5px solid #e0e7ff; margin: 1.2rem 0;">
+    <h4 style="color: #a21caf; font-size: 1.25rem; margin-bottom: 0.5rem;">Ratings</h4>
+    {% if book.ratings_stats %}
+        <p style="font-size: 1.08rem;">Average: <b style="color: #6366f1;">{{ book.ratings_stats.avg_rating }}</b> ({{ book.ratings_stats.rating_count }} ratings)</p>
+        <p style="font-size: 1.08rem;">Min: {{ book.ratings_stats.min_rating }}, Max: {{ book.ratings_stats.max_rating }}</p>
+    {% else %}
+        <p style="color: #888;">No ratings yet.</p>
+    {% endif %}
+    <hr style="border-top: 1.5px solid #e0e7ff; margin: 1.2rem 0;">
+    <h4 style="color: #a21caf; font-size: 1.25rem; margin-bottom: 0.5rem;">Recent Reviews</h4>
+    {% if book.recent_reviews and book.recent_reviews|length > 0 %}
+        <ul style="padding-left: 1.1rem;">
+        {% for review in book.recent_reviews %}
+            <li style="margin-bottom: 0.7rem;"><strong style="color: #4f46e5;">{{ review.username }}</strong> <span style="color: #f59e42;">({{ review.rating }})</span>: {{ review.review }}<br><small style="color: #64748b;">{{ review.created_at }}</small></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: #888;">No recent reviews.</p>
+    {% endif %}
+    <hr style="border-top: 1.5px solid #e0e7ff; margin: 1.2rem 0;">
+    <h4 style="color: #a21caf; font-size: 1.25rem; margin-bottom: 0.5rem;">Rate this Book</h4>
+    {% if user and user.is_authenticated %}
+    <form method="post" action="{{ url_for('rate_book', book_id=book.id) }}" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+        <label for="rating" style="font-size: 1.08rem;">Your Rating:</label>
+        <select name="rating" id="rating" required style="padding: 0.5rem 1rem; font-size: 1.08rem; border-radius: 6px; border: 1.5px solid #6366f1; background: #fff;">
+            {% for i in range(1, 11) %}
+            <option value="{{ i }}">{{ i }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="padding: 0.5rem 1.3rem; font-size: 1.08rem; background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s;">Submit Rating</button>
+    </form>
+    {% else %}
+    <div class="alert alert-info" style="background: #f4f8fb; color: #4f46e5; border-radius: 6px; padding: 0.7rem 1rem;">Please <a href="{{ url_for('login_page') }}" style="color: #a21caf; text-decoration: underline;">log in</a> to rate this book.</div>
+    {% endif %}
+    <br>
+    <a href="{{ url_for('books_search_page') }}" style="color: #4f46e5; font-size: 1.08rem; text-decoration: none; font-weight: 500; transition: color 0.2s;" onmouseover="this.style.color='#a21caf'" onmouseout="this.style.color='#4f46e5'">&larr; Back to Search</a>
+</div>
+{% endblock %} 

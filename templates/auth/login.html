@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Recommendation System{% endblock %}
+
+{% block content %}
+<div style="max-width: 400px; margin: 2rem auto;">
+    <div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); box-shadow: 0 4px 24px rgba(80,80,180,0.10); border-radius: 22px; padding: 2.5rem 2rem;">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #4f46e5; font-size: 2rem; font-weight: 800; letter-spacing: 1px;">Welcome Back!</h2>
+        
+        <form id="loginForm" method="post" action="{{ url_for('login_page') }}">
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="username" style="font-weight: 600; color: #6366f1;">Username</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Enter your username" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="password" style="font-weight: 600; color: #6366f1;">Password</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="Enter your password" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.7rem;">
+                <button type="submit" class="btn" style="width: 100%; padding: 1rem 0; font-size: 1.15rem; background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border-radius: 8px; font-weight: 700;">Login to My Account</button>
+            </div>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1rem;">
+            <p>Don't have an account? <a href="/register" style="color: #4f46e5; text-decoration: underline; font-weight: 600;">Register here</a></p>
+        </div>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'message' or category == 'success' else 'error' }}" style="background: #f4f8fb; color: #4f46e5; border-radius: 6px; padding: 0.7rem 1rem; margin-bottom: 0.5rem;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>
+{% endblock %}

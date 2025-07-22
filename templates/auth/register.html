@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Register - Recommendation System{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto;">
+    <div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); box-shadow: 0 4px 24px rgba(80,80,180,0.10); border-radius: 22px; padding: 2.5rem 2rem;">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #4f46e5; font-size: 2rem; font-weight: 800; letter-spacing: 1px;">Create Your Account</h2>
+        
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 2rem; font-size: 1.1rem;">
+            Register to get personalized book recommendations
+        </p>
+        
+        <!-- Simple HTML form that submits to the API -->
+        <form action="#" method="post" id="registerForm">
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="username" style="font-weight: 600; color: #6366f1;">Username *</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="Choose a unique username" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="email" style="font-weight: 600; color: #6366f1;">Email Address *</label>
+                <input type="email" id="email" name="email" required 
+                       placeholder="your.email@example.com" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="password" style="font-weight: 600; color: #6366f1;">Password *</label>
+                <input type="password" id="password" name="password" required 
+                       minlength="6" placeholder="At least 6 characters" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="age" style="font-weight: 600; color: #6366f1;">Age</label>
+                <input type="number" id="age" name="age" min="13" max="100" 
+                       placeholder="Optional" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label for="location" style="font-weight: 600; color: #6366f1;">Location</label>
+                <select id="location" name="location" style="width: 100%; padding: 0.8rem 1rem; border-radius: 8px; border: 1.5px solid #6366f1; background: #fff; font-size: 1.08rem;">
+                    <option value="">Select your country (optional)</option>
+                    <option value="USA">United States</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Australia">Australia</option>
+                    <option value="Germany">Germany</option>
+                    <option value="France">France</option>
+                    <option value="India">India</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.2rem;">
+                <label style="font-weight: 600; color: #6366f1;">Favorite Book Genres (Check all that apply):</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-top: 0.5rem;">
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="fiction"> Fiction</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="mystery"> Mystery</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="romance"> Romance</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="sci-fi"> Science Fiction</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="fantasy"> Fantasy</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="biography"> Biography</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="history"> History</label>
+                    <label style="font-weight: normal;"><input type="checkbox" name="genres" value="self-help"> Self-Help</label>
+                </div>
+            </div>
+            
+            <div class="form-group" style="margin-bottom: 1.7rem;">
+                <button type="submit" class="btn" style="width: 100%; padding: 1rem 0; font-size: 1.15rem; background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border-radius: 8px; font-weight: 700;">Create My Account</button>
+            </div>
+        </form>
+        
+        <div style="text-align: center; margin-top: 1rem;">
+            <p>Already have an account? <a href="/login" style="color: #4f46e5; text-decoration: underline; font-weight: 600;">Login here</a></p>
+        </div>
+        
+        <div id="status-message"></div>
+    </div>
+</div>
+
+<script>
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const statusDiv = document.getElementById('status-message');
+    
+    // Show loading
+    submitBtn.innerHTML = 'Creating Account...';
+    submitBtn.disabled = true;
+    
+    // Collect form data
+    const genres = Array.from(form.querySelectorAll('input[name="genres"]:checked'))
+                       .map(cb => cb.value);
+    
+    const userData = {
+        username: formData.get('username'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        age: formData.get('age') ? parseInt(formData.get('age')) : null,
+        location: formData.get('location'),
+        preferences: {
+            favorite_genres: genres
+        }
+    };
+    
+    try {
+        const response = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok && result.access_token) {
+            // Success
+            statusDiv.innerHTML = `
+                <div class="alert alert-success">
+                    <strong>Success!</strong> Account created successfully! 
+                    <br>Welcome, ${result.user.username}!
+                    <br><a href="/login">Click here to login</a>
+                </div>
+            `;
+            form.reset();
+        } else {
+            // Error
+            statusDiv.innerHTML = `
+                <div class="alert alert-error">
+                    <strong>Error:</strong> ${result.error || 'Registration failed'}
+                </div>
+            `;
+        }
+    } catch (error) {
+        statusDiv.innerHTML = `
+            <div class="alert alert-error">
+                <strong>Error:</strong> Unable to connect to server. Please try again.
+            </div>
+        `;
+    }
+    
+    // Reset button
+    submitBtn.innerHTML = 'Create My Account';
+    submitBtn.disabled = false;
+});
+</script>
+{% endblock %}

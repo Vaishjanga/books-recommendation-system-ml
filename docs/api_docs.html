@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}API Documentation - Recommendation System{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Recommendation System API</h2>
+    <p>Complete REST API for book recommendations with machine learning.</p>
+    
+    <div style="background: #f8f9fa; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
+        <strong>Base URL:</strong> <code>{{ request.url_root }}api</code>
+    </div>
+</div>
+
+<div class="card">
+    <h3> Authentication</h3>
+    <p>This API uses JWT tokens. Include the token in the Authorization header:</p>
+    <div style="background: #2c3e50; color: white; padding: 1rem; border-radius: 4px; font-family: monospace;">
+        Authorization: Bearer &lt;your_jwt_token&gt;
+    </div>
+    
+    <h4>Register New User</h4>
+    <div style="background: #27ae60; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        POST /auth/register
+    </div>
+    <pre style="background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+{
+  "username": "john_doe",
+  "email": "john@example.com",
+  "password": "password123",
+  "age": 25,
+  "location": "New York",
+  "preferences": {
+    "favorite_genres": ["fiction", "mystery"]
+  }
+}</pre>
+
+    <h4>Login User</h4>
+    <div style="background: #27ae60; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        POST /auth/login
+    </div>
+    <pre style="background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+{
+  "username": "john_doe",
+  "password": "password123"
+}</pre>
+</div>
+
+<div class="card">
+    <h3> Recommendations</h3>
+    
+    <h4>Get Personalized Recommendations</h4>
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /recommendations/{user_id}
+    </div>
+    
+    <p><strong>Query Parameters:</strong></p>
+    <ul>
+        <li><code>algorithm</code> - hybrid, collaborative, content (default: hybrid)</li>
+        <li><code>top_n</code> - Number of recommendations (default: 10, max: 50)</li>
+        <li><code>device</code> - mobile, tablet, desktop</li>
+        <li><code>time_of_day</code> - Hour (0-23)</li>
+        <li><code>user_mood</code> - happy, sad, curious, bored</li>
+    </ul>
+    
+    <p><strong>Example:</strong></p>
+    <div style="background: #f4f4f4; padding: 1rem; border-radius: 4px; font-family: monospace;">
+        GET /api/recommendations/user123?algorithm=hybrid&top_n=5&device=mobile
+    </div>
+</div>
+
+<div class="card">
+    <h3> Books</h3>
+    
+    <h4>Search Books</h4>
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /books/search
+    </div>
+    
+    <p><strong>Query Parameters:</strong></p>
+    <ul>
+        <li><code>q</code> - Search query (required)</li>
+        <li><code>limit</code> - Max results (default: 20, max: 100)</li>
+    </ul>
+    
+    <h4>Get Similar Books</h4>
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /books/{book_id}/similar
+    </div>
+    
+    <h4>Get Book Details</h4>
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /books/{book_id}
+    </div>
+</div>
+
+<div class="card">
+    <h3> Feedback</h3>
+    
+    <h4>Record User Feedback</h4>
+    <div style="background: #27ae60; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        POST /feedback
+    </div>
+    
+    <p><strong>Feedback Types:</strong> view, like, dislike, save, skip, rating</p>
+    
+    <pre style="background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto;">
+{
+  "book_id": "book123",
+  "feedback_type": "like",
+  "feedback_data": {
+    "device": "mobile",
+    "session_duration": 300
+  }
+}</pre>
+</div>
+
+<div class="card">
+    <h3>🔧 Admin</h3>
+    
+    <h4>System Statistics</h4>
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /admin/stats
+    </div>
+    
+    <h4>Retrain Models</h4>
+    <div style="background: #27ae60; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        POST /admin/retrain
+    </div>
+</div>
+
+<div class="card">
+    <h3> Health Check</h3>
+    
+    <div style="background: #3498db; color: white; padding: 0.5rem; border-radius: 4px; display: inline-block; margin: 0.5rem 0;">
+        GET /health
+    </div>
+    
+    <p>Check system health status, database connectivity, and Redis status.</p>
+</div>
+
+<div class="card" style="background: #f8f9fa;">
+    <h3>Quick Start</h3>
+    <ol>
+        <li>Register a new user at <code>POST /api/auth/register</code></li>
+        <li>Login to get JWT token at <code>POST /api/auth/login</code></li>
+        <li>Use the token in Authorization header for protected endpoints</li>
+        <li>Get recommendations at <code>GET /api/recommendations/{user_id}</code></li>
+        <li>Record feedback at <code>POST /api/feedback</code></li>
+    </ol>
+    
+    <p><strong>Rate Limits:</strong></p>
+    <ul>
+        <li>Authentication: 5-10 requests/minute</li>
+        <li>Recommendations: 100 requests/hour</li>
+        <li>Search: 100 requests/hour</li>
+        <li>Feedback: 500 requests/hour</li>
+    </ul>
+</div>
+{% endblock %}

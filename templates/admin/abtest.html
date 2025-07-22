@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}A/B Testing Platform - Recommendation System{% endblock %}
+
+{% block content %}
+<h2 style="color: #4f46e5; font-size: 2.2rem; font-weight: 800; margin-bottom: 1.5rem; text-align: center; letter-spacing: 1px;">A/B Testing Platform</h2>
+<div style="margin-bottom: 1rem; text-align: center;">
+    <a href="/admin" class="btn" style="background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border-radius: 8px; font-weight: 600;">Back to Admin Dashboard</a>
+</div>
+
+<div class="card" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%); border-radius: 18px; box-shadow: 0 2px 8px rgba(99,102,241,0.07); max-width: 900px; margin: 2.5rem auto 2rem auto; padding: 2.5rem 2rem;">
+    <h3 style="color: #a21caf; font-size: 1.3rem; font-weight: 700;">A/B Tests</h3>
+    <form method="POST" action="{{ url_for('admin_create_abtest') }}" style="margin-bottom:1rem; display: flex; gap: 0.7rem; flex-wrap: wrap; align-items: center;">
+        <input name="name" placeholder="Test Name" required style="padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid #6366f1; background: #f8fafc;">
+        <input name="algorithm_a" placeholder="Algorithm A" required style="padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid #6366f1; background: #f8fafc;">
+        <input name="algorithm_b" placeholder="Algorithm B" required style="padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid #6366f1; background: #f8fafc;">
+        <input name="traffic_split" type="number" step="0.01" min="0" max="1" value="0.5" required style="padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid #6366f1; background: #f8fafc; width: 90px;">
+        <button type="submit" class="btn" style="padding: 0.5rem 1.3rem; font-size: 1.08rem; background: linear-gradient(90deg, #6366f1 0%, #a21caf 100%); color: #fff; border-radius: 6px; font-weight: 600;">Create A/B Test</button>
+    </form>
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f8fb; color: #4f46e5;">
+                <th style="padding: 0.7rem;">Test Name</th>
+                <th>Algorithm A</th>
+                <th>Algorithm B</th>
+                <th>Status</th>
+                <th>Traffic Split</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for abtest in abtests %}
+            <tr style="background: #fff;">
+                <td style="padding: 0.7rem;">{{ abtest.name }}</td>
+                <td>{{ abtest.algorithm_a }}</td>
+                <td>{{ abtest.algorithm_b }}</td>
+                <td>{{ 'Active' if abtest.is_active else 'Stopped' }}</td>
+                <td>{{ abtest.traffic_split }}</td>
+                <td>{{ abtest.created_at.strftime('%Y-%m-%d %H:%M') if abtest.created_at else '' }}</td>
+                <td>
+                    {% if abtest.is_active %}
+                    <form method="POST" action="{{ url_for('admin_stop_abtest', test_id=abtest.id) }}">
+                        <button type="submit" class="btn btn-danger" style="padding: 0.4rem 1rem; border-radius: 6px;">Stop</button>
+                    </form>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr><td colspan="7" style="text-align:center; color:#7f8c8d;">No A/B tests found</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="card" style="background: #f4f8fb; border-radius: 18px; box-shadow: 0 2px 8px rgba(99,102,241,0.07); max-width: 900px; margin: 2.5rem auto 2rem auto; padding: 2.5rem 2rem;">
+    <h3 style="color: #4f46e5; font-size: 1.2rem; font-weight: 700;">A/B Test Assignments</h3>
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f4f8fb; color: #4f46e5;">
+                <th>User ID</th>
+                <th>Test Name</th>
+                <th>Variant</th>
+                <th>Assigned At</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for assignment in assignments %}
+            <tr style="background: #fff;">
+                <td>{{ assignment.user_id }}</td>
+                <td>{{ assignment.test_name }}</td>
+                <td>{{ assignment.variant }}</td>
+                <td>{{ assignment.assigned_at.strftime('%Y-%m-%d %H:%M') if assignment.assigned_at else '' }}</td>
+            </tr>
+        {% else %}
+            <tr><td colspan="4" style="text-align:center; color:#7f8c8d;">No assignments found</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
